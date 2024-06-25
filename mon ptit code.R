@@ -108,7 +108,7 @@ graph_plotly <- trafic_aeroports %>%
     hovertemplate = paste("<i>Aéroport:</i> ",nom_aer,"<br>Trafic: %{y}") ) #paste("<i>Aéroport:</i> %{text}<br>Trafic: %{y}") )
 graph_plotly
 
-
+#sous forme de fonction
 plot_airport_line <- function(df,airport){
   
   default_airport<-liste_aeroports[liste_aeroports==airport]
@@ -129,3 +129,78 @@ plot_airport_line <- function(df,airport){
   graph_plotly
   }
 plot_airport_line(pax_apt_all,"LFBA")
+
+
+##Exo4 : tableau HTML-----
+YEARS_LIST  <- as.character(2018:2022)
+MONTHS_LIST <- 1:12
+
+
+summary_stat_airport <- function(df,year,month){
+  stats_aeroports <- df %>% 
+    filter(an==year & mois==month) %>% 
+    mutate(total= apt_pax_dep + apt_pax_tr + apt_pax_arr,
+           aeroport=paste0(apt_nom," (",apt,")")) %>% 
+    arrange(desc(total)) %>% 
+    select(aeroport,apt_pax_dep,apt_pax_tr, apt_pax_arr,total)
+  return(stats_aeroports)
+}
+
+tab <-  summary_stat_airport(pax_apt_all,"2022","7")
+
+#dans correction, font des group  by et somme si jamais il y a a plusieeurs anénes /mois
+
+library(gt)
+stats_aeroports %>% 
+  ungroup() %>% 
+  select(cleanname, paxdep,paxarr, paxtra) %>% 
+  gt() %>% 
+  fmt_number(columns=c(paxdep,paxarr, paxtra), suffixing=T) %>% 
+  fmt_markdown(columns=cleanname) %>% 
+  cols_label(cleanname="Aéroports",
+             paxdep='Départs',
+             paxarr='Arrivées',
+             paxtra="Transits") %>% 
+  tab_header(title=md("*Nombre de passagers par aéroport*"),
+             subtitle=md(paste0("Classement au 1/",month,"/",year)))%>% 
+  tab_source_note("Source: DGAC, via data.gouv.fr") %>% 
+  tab_options(table.font.names = "Marianne") %>% 
+    # tab_style(style=cell_text(weight='bold'), locations =list(cells_column_labels(), cells_stubhead()) ) %>% 
+  opt_interactive()
+
+
+## Exo5: carte
+library(sf)
+library(leaflet)
+
+palette <- c("#91AE4F","#484D7A","#E18B63") #ne fonctionne pas..... LEAFLET DEMISSION
+
+palette <- c("darkgreen", "darkblue", "darkred")
+trafic_aeroports <- pax_apt_all %>% 
+  filter(an==year & mois==month) %>% 
+  mutate(trafic=apt_pax_dep + apt_pax_tr + apt_pax_arr) %>% 
+  left_join(airport_location %>% 
+              select(Nom, Code.IATA, Code.OACI,geometry), by=c("apt"="Code.OACI")) %>%
+  filter(is.na(Code.IATA)==F) %>% 
+  mutate(volume=ntile(trafic,3)) %>% 
+  mutate(color=palette[volume]) %>% 
+  st_as_sf(sf_column_name = 'geometry')
+
+sf::st_crs(trafic_aeroports)
+
+icons <- awesomeIcons(
+  icon = 'plane',
+  iconColor = 'black',
+  library = 'fa',
+  markerColor = trafic_aeroports$color
+)
+
+leaflet(trafic_aeroports) %>% 
+  addTiles() %>% 
+  addAwesomeMarkers(
+    icon=icons[],
+    popup=~paste0(Nom, " : ",trafic," voyageurs"))
+
+
+
+
