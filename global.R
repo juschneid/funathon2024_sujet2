@@ -6,6 +6,13 @@ source("R/figures.R")
 source("R/divers_function.R")
 source("R/tables.R")
 
+# source("correction/R/import_data.R")
+# source("correction/R/create_data_list.R")
+# source("correction/R/clean_dataframe.R")
+# source("correction/R/divers_functions.R")
+# source("correction/R/tables.R")
+# source("correction/R/figures.R")
+
 #Import des packages
 library(tidyverse)
 library(readr)
@@ -13,7 +20,10 @@ library(sf)
 library(plotly)
 library(gt)
 library(leaflet)
+library(bslib)
 
+
+YEARS_LIST = 2018:2022
 MONTHS_LIST = 1:12
 
 # Load data ----------------------------------
@@ -29,19 +39,13 @@ airport_location <- sf::st_read(unlist(urls$geojson$airport))
 liste_aeroports <- unique(pax_apt_all$apt)
 default_airport <- liste_aeroports[1]
 
-figure_plotly <- plot_airport_line(pax_apt_all, default_airport)
-figure_plotly
 
+# OBJETS NECESSAIRES A L'APPLICATION ------------------------
 
-YEARS_LIST  <- as.character(2018:2022)
-MONTHS_LIST <- 1:12
-
-year <- YEARS_LIST[1]
-month <- MONTHS_LIST[1]
-stats_aeroports <- summary_stat_airport(pax_apt_all, year, month)
-table_airports <- create_table_airports(stats_aeroports)
-table_airports
-
-carte_interactive <- map_leaflet_airport(pax_apt_all,airports_location, month, year)
-carte_interactive
+trafic_aeroports <- pax_apt_all %>%
+  mutate(trafic = apt_pax_dep + apt_pax_tr + apt_pax_arr) %>%
+  filter(apt %in% default_airport) %>%
+  mutate(
+    date = as.Date(paste(anmois, "01", sep=""), format = "%Y%m%d")
+  )
 

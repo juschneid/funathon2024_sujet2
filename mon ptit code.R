@@ -169,13 +169,13 @@ stats_aeroports %>%
   opt_interactive()
 
 
-## Exo5: carte
+## Exo5: carte ----
 library(sf)
 library(leaflet)
 
-palette <- c("#91AE4F","#484D7A","#E18B63") #ne fonctionne pas..... LEAFLET DEMISSION
 
-palette <- c("darkgreen", "darkblue", "darkred")
+palette <- c("green", "orange", "darkred")
+
 trafic_aeroports <- pax_apt_all %>% 
   filter(an==year & mois==month) %>% 
   mutate(trafic=apt_pax_dep + apt_pax_tr + apt_pax_arr) %>% 
@@ -202,5 +202,14 @@ leaflet(trafic_aeroports) %>%
     popup=~paste0(Nom, " : ",trafic," voyageurs"))
 
 
+########test fait en restart session clean tout => OK!
+
+# PART3 : APPLICATION ------
+
+##Exo6 : créer la structure de l'application ----
+#créer global; ui , server ... tout est déjà prêt
+# depuis la console : shiny::runApp() 
+
+#Exo7 : finaliser l'application ----
 
 
