@@ -3,23 +3,24 @@ plot_airport_line <- function(df,selected_airport){
   trafic_aeroports <- df %>% 
     mutate(trafic=apt_pax_dep + apt_pax_tr + apt_pax_arr,
            date=as.Date(paste("1",mois,an,sep="-"),format="%d-%m-%Y"))%>%  
-    filter(apt %in% selected_airport) 
+    filter(apt_nom %in% selected_airport) 
 
   figure_plotly <- trafic_aeroports %>% 
     plot_ly(
       x=~date, y=~trafic, 
       text=~apt_nom,
       color=I('orange'),
-      name="trafic",
+      name="",
       type='scatter',
       mode='lines+markers',
-      hovertemplate = paste("<i>Aéroport:</i> %{text}<br>Trafic: %{y}") ) #paste("<i>Aéroport:</i> %{text}<br>Trafic: %{y}") )
+      hovertemplate = paste("<i>Aéroport:</i> %{text}<br>Trafic: %{y}")) %>% 
+    layout(xaxis=list(title="Mois de l'année"), yaxis=list(title="Nombre de passagers"))
   
   return(figure_plotly)
 }
 
 
-map_leaflet_airport  <- function(df, airports_location, months, years){
+map_leaflet_airport  <- function(df, airports_location, month, year){
   
 palette <- c("green", "orange", "darkred")
 

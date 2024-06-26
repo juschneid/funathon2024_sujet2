@@ -13,7 +13,7 @@ function(input, output) {
   })
   
   output$table <- render_gt(
-    create_table_airports(table_liaisons())
+    create_table_airports(table_liaisons(),year(input$date),month(input$date) )
   )
   
   output$carte <- renderLeaflet(

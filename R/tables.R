@@ -1,4 +1,5 @@
-create_table_airports <- function(stats_aeroports){
+create_table_airports <- function(stats_aeroports, year, month){
+  mois<- format(as.Date(paste0(year,"-",month,"-01"), format="%Y-%m-%d"), "%b",local="fr" ) #calcul automatique
   table_aeroports <- stats_aeroports %>% 
     ungroup() %>% 
     select(cleanname, everything()) %>% 
@@ -11,9 +12,7 @@ create_table_airports <- function(stats_aeroports){
                paxdep=md('Départs'),
                paxarr=md('Arrivées'),
                paxtra=md("Transits")) %>% 
-  tab_header(title=md("**Nombre de passagers par aéroport**"),
-             subtitle=md(paste0("*Classement au 1/",month,"/",year,"*")))%>% 
-  tab_source_note("Source: DGAC, via data.gouv.fr") %>% 
+  tab_header(title=md(paste0("**Nombre de passagers par aéroport - ",mois," ",year,"**")))%>% 
   tab_options(table.font.names = "Marianne") %>% 
   opt_interactive()
   

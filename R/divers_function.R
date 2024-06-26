@@ -8,7 +8,7 @@ summary_stat_airport <- function(data, year, month){
       paxtra = round(sum(apt_pax_tr, na.rm = T),3)) %>% 
     mutate(paxtot= paxdep+paxarr+paxtra) %>%
     arrange(desc(paxtot)) %>% 
-    mutate(cleanname=paste0(apt_nom," (",apt,")"))
+    mutate(cleanname=paste0(str_to_title(apt_nom)," (",apt,")"))
   
   return(stats_aeroports)
 }

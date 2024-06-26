@@ -36,7 +36,8 @@ pax_lsn_all<- import_liaisons_data(unlist(urls$liaisons))
 
 airport_location <- sf::st_read(unlist(urls$geojson$airport))
 
-liste_aeroports <- unique(pax_apt_all$apt)
+apt_all <- pax_apt_all %>%  distinct(apt_nom) %>% arrange(apt_nom)
+liste_aeroports <- unique(apt_all$apt_nom)
 default_airport <- liste_aeroports[1]
 
 
@@ -44,7 +45,7 @@ default_airport <- liste_aeroports[1]
 
 trafic_aeroports <- pax_apt_all %>%
   mutate(trafic = apt_pax_dep + apt_pax_tr + apt_pax_arr) %>%
-  filter(apt %in% default_airport) %>%
+  filter(apt_nom %in% default_airport) %>%
   mutate(
     date = as.Date(paste(anmois, "01", sep=""), format = "%Y%m%d")
   )
